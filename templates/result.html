@@ -11,6 +11,15 @@
     {% if score_percentage is not none %}
     <p>Your score: {{ score_percentage|round(2) }}</p>
     {% endif %}
+
+    <h2>Review incorrect answers:</h2>
+    {% for question, user_choice, correct_answer in incorrect_answers %}
+        <p><strong>Question:</strong> {{ question }}</p>
+        <p><strong>Your answer:</strong> {{ user_choice }}</p>
+        <p><strong>Correct answer</strong> {{ correct_answer }}</p>
+        <hr>
+    {% endfor %}
+
     <a href="{{ url_for('index') }}">Go back to the main page</a>
 </body>
 </html>

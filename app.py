@@ -74,6 +74,7 @@ def results():
         num_questions = len(session['flashcards'])
         num_correct = session['num_correct']
         num_answered = session['current_question']
+        incorrect_answers = session['incorrect_answers']
 
         # Calculate the percentage of correct answers
         if num_answered != 0:
@@ -81,7 +82,7 @@ def results():
         else:
             score_percentage = None
 
-        return render_template('result.html', num_correct=num_correct, num_questions=num_questions, num_answered=num_answered, score_percentage=score_percentage)
+        return render_template('result.html', num_correct=num_correct, num_questions=num_questions, num_answered=num_answered, score_percentage=score_percentage, incorrect_answers=incorrect_answers)
     else:
         return redirect(url_for('index'))
 
