@@ -1,10 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 import pandas as pd
 import random
-import os
+import secrets
 
 app = Flask(__name__)
-app.secret_key = 'some_secret_key'  # Replace this with a secret key of your choice
+app.secret_key = secrets.token_urlsafe(16)
 
 def load_flashcards(file):
     df = pd.read_excel(file)
@@ -64,11 +64,11 @@ def quiz():
 
         session['current_question'] += 1
         if session['current_question'] >= len(session['flashcards']):
-            return redirect(url_for('result'))
+            return redirect(url_for('results'))
 
     return render_template('quiz.html', get_multiple_choices=get_multiple_choices)
 
-@app.route('/results', methods=['POST'])
+@app.route('/results', methods=['GET', 'POST'])
 def results():
     if 'flashcards' in session:
         num_questions = len(session['flashcards'])
@@ -81,7 +81,7 @@ def results():
         else:
             score_percentage = None
 
-        return render_template('results.html', num_correct=num_correct, num_questions=num_questions, num_answered=num_answered, score_percentage=score_percentage)
+        return render_template('result.html', num_correct=num_correct, num_questions=num_questions, num_answered=num_answered, score_percentage=score_percentage)
     else:
         return redirect(url_for('index'))
 

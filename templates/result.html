@@ -9,7 +9,7 @@
     <h1>Quiz Results</h1>
     <p>You answered {{ num_correct }}/{{ num_answered }} questions correctly.</p>
     {% if score_percentage is not none %}
-    <p>Your score: {{ score_percentage|round(2) }}%</p>
+    <p>Your score: {{ score_percentage|round(2) }}</p>
     {% endif %}
     <a href="{{ url_for('index') }}">Go back to the main page</a>
 </body>
