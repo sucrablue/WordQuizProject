@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results</title>
+</head>
+<body>
+    <h1>Quiz Results</h1>
+    <p>You answered {{ num_correct }}/{{ num_answered }} questions correctly.</p>
+    {% if score_percentage is not none %}
+    <p>Your score: {{ score_percentage|round(2) }}%</p>
+    {% endif %}
+    <a href="{{ url_for('index') }}">Go back to the main page</a>
+</body>
+</html>
