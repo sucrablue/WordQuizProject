@@ -4,68 +4,67 @@ import pandas as pd
 import random
 import os
 
-# These are the required columns in the Excel file
-REQUIRED_COLUMNS = ['Question', 'Answer']
-# This determines the number of multiple-choice options presented to the user for each question
-NUM_CHOICES = 4
+REQUIRED_COLUMNS = ['Question', 'Answer'] # 必要な列名をリストとして定義
+NUM_CHOICES = 4 # 選択肢の数を定義
 
-# Load the flashcards from an Excel file
+# Excelファイルからフラッシュカードをロード
 def load_flashcards(file_name):
     try:
-        df = pd.read_excel(file_name)
-        # Check if the file has all the required columns
-        if not all(column in df.columns for column in REQUIRED_COLUMNS):
+        df = pd.read_excel(file_name) # pandasを使ってExcelファイルを読み込む
+
+        if not all(column in df.columns for column in REQUIRED_COLUMNS): # ファイルに必要な列（'Question', 'Answer'）が全て存在することを確認
             print("The file must have 'Question' and 'Answer' columns.")
             return None
-        flashcards = df[REQUIRED_COLUMNS].to_dict('records')
+
+        flashcards = df[REQUIRED_COLUMNS].to_dict('records') # 必要な列だけを含む辞書を作成
         return flashcards
+
     except Exception as e:
         print(f"Error loading file: {e}")
         return None
 
-# Given a list of flashcards and a correct answer, this function generates multiple choices (1 correct and 3 incorrect)
-def get_multiple_choices(flashcards, correct_answer):
-    incorrect_flashcards = [fc['Answer'] for fc in flashcards if fc['Answer'] != correct_answer]
-    choices = [correct_answer] + random.sample(incorrect_flashcards, NUM_CHOICES - 1)
-    random.shuffle(choices)
+# 正しい答えと他の選択肢を取得
+def get_multiple_choices(flashcards, correct_answer): 
+    incorrect_flashcards = [fc['Answer'] for fc in flashcards if fc['Answer'] != correct_answer] # flashcardsの中から正しい答え以外のものを選ぶ
+    choices = [correct_answer] + random.sample(incorrect_flashcards, NUM_CHOICES - 1) # 正解と誤答を混ぜた選択肢を作成
+    random.shuffle(choices) # 選択肢の順序をシャッフル
     return choices
 
-# Display a question and its choices
+# 問題と選択肢を表示
 def display_question_and_choices(idx, num_questions, question, choices):
     print(f"Question {idx}/{num_questions}: {question}")
-    for i, choice in enumerate(choices, start=1):
+    for i, choice in enumerate(choices, start=1): # 選択肢を順番に表示
         print(f"{i}. {choice}")
 
+# クイズを実施
 def quiz_flashcards(flashcards):
     num_correct = 0
     num_questions = len(flashcards)
-    random.shuffle(flashcards)
+    random.shuffle(flashcards) # flashcardsの順序をシャッフル
     incorrect_answers = []
-    
-    # Add a new variable to keep track of the current question number
     current_question = 0
 
     for idx, flashcard in enumerate(flashcards, start=1):
         question = flashcard['Question']
         answer = flashcard['Answer']
-        choices = get_multiple_choices(flashcards, answer)
+        choices = get_multiple_choices(flashcards, answer) # 正解と他の選択肢を取得
 
-        display_question_and_choices(idx, num_questions, question, choices)
-        user_answer = input("Your answer (or type 'stop' to end the quiz): ")
+        display_question_and_choices(idx, num_questions, question, choices) # 質問と選択肢を表示
+
+        user_answer = input("Your answer (or type 'stop' to end the quiz): ") # 回答を取得
 
         if user_answer.strip().lower() == 'stop':
             break
 
-        # Increment the current question number after a 'stop' has not been received
         current_question += 1
 
         try:
-            user_choice = choices[int(user_answer) - 1]
+            user_choice = choices[int(user_answer) - 1] # 選んだ選択肢を取得
         except (ValueError, IndexError):
             print("Invalid input. Skipping this question.")
             continue
 
-        if user_choice.strip().lower() == answer.strip().lower():
+        if user_choice.strip().lower() == answer.strip().lower(): # 選んだ選択肢が正解と一致するか確認
             print("Correct!")
             num_correct += 1
         else:
@@ -73,15 +72,14 @@ def quiz_flashcards(flashcards):
             incorrect_answers.append((question, user_choice, answer))
         print()
 
-    # Use current_question instead of idx - 1
     print(f"Your score: {num_correct}/{current_question}")
 
-    if incorrect_answers:
-        print("\nReview your incorrect answers:")
+    if incorrect_answers: # 間違えた問題を表示
+        print("\nReview your incorrect answers:\n")
         for question, user_choice, correct_answer in incorrect_answers:
             print(f"Question: {question}\nYour answer: {user_choice}\nCorrect answer: {correct_answer}\n")
 
-# Validate the user's input to make sure it is a valid number within the correct range
+# エラー処理
 def validate_user_input(user_input, max_valid):
     try:
         user_choice = int(user_input)
@@ -94,24 +92,9 @@ def validate_user_input(user_input, max_valid):
         print("Invalid input. Please enter a number.")
         return None
 
-# Print the results of the quiz and save them to a text file
-def print_and_save_results(num_correct, num_questions, incorrect_answers):
-    print(f"Your score: {num_correct}/{num_questions}")
-
-    if incorrect_answers:
-        print("\nReview your incorrect answers:")
-        for question, user_choice, correct_answer in incorrect_answers:
-            print(f"Question: {question}\nYour answer: {user_choice}\nCorrect answer: {correct_answer}\n")
-
-    with open('quiz_results.txt', 'w') as f:
-        f.write(f"Your score: {num_correct}/{num_questions}\n")
-        if incorrect_answers:
-            f.write("\nReview your incorrect answers:\n")
-            for question, user_choice, correct_answer in incorrect_answers:
-                f.write(f"Question: {question}\nYour answer: {user_choice}\nCorrect answer: {correct_answer}\n")
-
+# Excelファイルを選択
 def select_excel_file():
-    files = [f for f in os.listdir('.') if os.path.isfile(f) and f.endswith('.xlsx')]
+    files = [f for f in os.listdir('.') if os.path.isfile(f) and f.endswith('.xlsx')] # ディレクトリにあるExcelファイルをリスト化
 
     if not files:
         print("No Excel files found in the current directory.")
@@ -138,7 +121,6 @@ if __name__ == "__main__":
     file_name = select_excel_file()
     if file_name:
         flashcards = load_flashcards(file_name)
-        # Add a check to ensure flashcards is not None
         if flashcards:
             quiz_flashcards(flashcards)
         else:
