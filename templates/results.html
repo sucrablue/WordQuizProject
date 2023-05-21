@@ -7,17 +7,14 @@
 </head>
 <body>
     <h1>Quiz Results</h1>
-    <p>You answered {{ num_correct }}/{{ num_answered }} questions correctly.</p>
-    {% if score_percentage is not none %}
-    <p>Your score: {{ score_percentage|round(2) }}</p>
-    {% endif %}
+    <p>You answered {{ num_correct }}/{{ num_questions }} questions correctly.</p>
+    <p>Your score: {{ score_percentage | round(2) }}%</p>
 
-    <h2>Review incorrect answers:</h2>
+    <h2>Incorrect Answers:</h2>
     {% for question, user_choice, correct_answer in incorrect_answers %}
         <p><strong>Question:</strong> {{ question }}</p>
         <p><strong>Your answer:</strong> {{ user_choice }}</p>
-        <p><strong>Correct answer</strong> {{ correct_answer }}</p>
-        <hr>
+        <p><strong>Correct answer:</strong> {{ correct_answer }}</p>
     {% endfor %}
 
     <a href="{{ url_for('index') }}">Go back to the main page</a>

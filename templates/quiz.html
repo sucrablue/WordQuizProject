@@ -27,14 +27,11 @@
         {% set answer = flashcard['Answer'] %}
         {% set choices = get_multiple_choices(session.flashcards, answer) %}
         <p>Question {{ session.current_question + 1 }}/{{ session.flashcards|length }}: {{ flashcard['Question'] }}</p>
-        <ol>
-            {% for choice in choices %}
-                <li>{{ choice }}</li>
-            {% endfor %}
-        </ol>
         <form action="{{ url_for('quiz') }}" method="POST" id="quiz-form">
-            <label for="user_answer">Your answer (or type 'stop' to end the quiz): </label>
-            <input type="text" name="user_answer">
+            {% for choice in choices %}
+                <input type="radio" name="user_answer" value="{{ loop.index }}">
+                <label>{{ choice }}</label><br>
+            {% endfor %}
             <button type="submit">Submit</button>
         </form>
         <p id="timer">Time left: <span id="time"></span></p>
